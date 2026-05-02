@@ -13,7 +13,7 @@ app = Flask(__name__)
 
 OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY")
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
-MODEL = "google/gemma-3-4b-it:free"
+MODEL = "mistralai/mistral-7b-instruct:free"
 
 SYSTEM_PROMPT = """Eres 'Heraldo', un narrador bíblico cálido y sabio.
 Cuando te pidan una historia bíblica, nárrala en exactamente 70-80 palabras.
