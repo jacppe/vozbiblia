@@ -22,7 +22,6 @@ No uses listas, asteriscos ni formato. Solo narración fluida en español."""
 
 
 def generar_historia(peticion: str) -> str:
-    """Llama a OpenRouter y devuelve la historia."""
     try:
         resp = requests.post(
             OPENROUTER_URL,
@@ -43,6 +42,7 @@ def generar_historia(peticion: str) -> str:
             timeout=15
         )
         data = resp.json()
+        print(f"OpenRouter respuesta completa: {data}")
         return data["choices"][0]["message"]["content"].strip()
 
     except Exception as e:
@@ -87,7 +87,7 @@ def narrar():
         return Response(str(resp), mimetype="text/xml")
 
     print(f"[Petición] {texto}")
-    historia = generar_historia(texto)
+    historia = _historia(texto)
     print(f"[Historia] {historia}")
 
     resp.say(historia, voice="Polly.Miguel", language="es-US")
