@@ -1,7 +1,7 @@
 """
 Agente de Voz Bíblico
 =====================
-Flask + Twilio + OpenRouter (Tencent HY3)
+Flask + Twilio + OpenRouter
 """
 
 from flask import Flask, request, Response
@@ -53,7 +53,6 @@ def generar_historia(peticion: str) -> str:
 @app.route("/voz/bienvenida", methods=["GET", "POST"])
 def bienvenida():
     resp = VoiceResponse()
-
     gather = Gather(
         input="speech",
         action="/voz/narrar",
@@ -87,7 +86,7 @@ def narrar():
         return Response(str(resp), mimetype="text/xml")
 
     print(f"[Petición] {texto}")
-    historia = _historia(texto)
+    historia = generar_historia(texto)
     print(f"[Historia] {historia}")
 
     resp.say(historia, voice="Polly.Miguel", language="es-US")
@@ -116,7 +115,7 @@ def narrar():
 
 @app.route("/health", methods=["GET"])
 def health():
-    return {"status": "ok", "agente": "Narrador Bíblico Maranatha"}, 200
+    return {"status": "ok", "agente": "Narrador Bíblico"}, 200
 
 
 if __name__ == "__main__":
