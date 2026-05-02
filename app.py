@@ -50,7 +50,7 @@ def bienvenida():
         timeout=6
     )
     gather.say(
-        "Bienvenido al narrador bíblico. "
+        "Bienvenido al narrador bíblico para mi Babucita. "
         "¿Qué historia de la Biblia deseas escuchar hoy?",
         voice="Polly.Miguel",
         language="es-US"
