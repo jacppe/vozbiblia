@@ -1,19 +1,17 @@
 """
 Agente de Voz Bíblico
 =====================
-Flask + Twilio + OpenRouter
+Flask + Twilio + Anthropic Claude
 """
 
 from flask import Flask, request, Response
 from twilio.twiml.voice_response import VoiceResponse, Gather
-import requests
+import anthropic
 import os
 
 app = Flask(__name__)
 
-OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY")
-OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
-MODEL = "mistralai/mistral-7b-instruct:free"
+client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 
 SYSTEM_PROMPT = """Eres 'Heraldo', un narrador bíblico cálido y sabio.
 Cuando te pidan una historia bíblica, nárrala en exactamente 70-80 palabras.
@@ -23,30 +21,20 @@ No uses listas, asteriscos ni formato. Solo narración fluida en español."""
 
 def generar_historia(peticion: str) -> str:
     try:
-        resp = requests.post(
-            OPENROUTER_URL,
-            headers={
-                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-                "Content-Type": "application/json",
-                "HTTP-Referer": "https://fundomaranatha.com",
-                "X-Title": "Narrador Biblico Maranatha"
-            },
-            json={
-                "model": MODEL,
-                "max_tokens": 200,
-                "messages": [
-                    {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": f"Narra la historia bíblica de: {peticion}"}
-                ]
-            },
-            timeout=15
+        message = client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=200,
+            system=SYSTEM_PROMPT,
+            messages=[
+                {"role": "user", "content": f"Narra la historia bíblica de: {peticion}"}
+            ]
         )
-        data = resp.json()
-        print(f"OpenRouter respuesta completa: {data}")
-        return data["choices"][0]["message"]["content"].strip()
+        historia = message.content[0].text.strip()
+        print(f"[Historia generada] {historia}")
+        return historia
 
     except Exception as e:
-        print(f"Error OpenRouter: {e}")
+        print(f"Error Claude API: {e}")
         return "Lo siento, en este momento no puedo narrar la historia. Por favor intenta más tarde."
 
 
@@ -87,7 +75,6 @@ def narrar():
 
     print(f"[Petición] {texto}")
     historia = generar_historia(texto)
-    print(f"[Historia] {historia}")
 
     resp.say(historia, voice="Polly.Miguel", language="es-US")
 
@@ -115,7 +102,7 @@ def narrar():
 
 @app.route("/health", methods=["GET"])
 def health():
-    return {"status": "ok", "agente": "Narrador Bíblico"}, 200
+    return {"status": "ok", "agente": "Narrador Bíblico Maranatha"}, 200
 
 
 if __name__ == "__main__":
